@@ -206,7 +206,7 @@ git push
 
 3. **Teste Production:**
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "create_powerpoint",
@@ -219,7 +219,7 @@ curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
 
 Erwarteter Download-Link:
 ```
-https://remote-mcp-server-8h8cr.ondigitalocean.app/download/token...
+https://mcp-bus-suyns.ondigitalocean.app/download/token...
 ```
 
 ---

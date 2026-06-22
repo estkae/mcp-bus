@@ -13,7 +13,7 @@
 ### Schritt 1: DigitalOcean App Platform öffnen
 
 1. Gehe zu: https://cloud.digitalocean.com/apps
-2. Finde deine App: **remote-mcp-server-8h8cr**
+2. Finde deine App: **mcp-bus-suyns**
 3. Klicke auf die App
 
 ### Schritt 2: Deployment triggern
@@ -78,7 +78,7 @@ INFO:     Uvicorn running on http://0.0.0.0:8080
 ### Test 1: MCP Endpoint (406 = OK!)
 
 ```bash
-curl -k https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp
+curl -k https://mcp-bus-suyns.ondigitalocean.app/mcp
 ```
 
 **Erwartete Antwort:**
@@ -96,7 +96,7 @@ Der Server läuft korrekt!
 3. → 🌐 Remote MCP Server URLs
 4. Trage ein:
    ```
-   https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp
+   https://mcp-bus-suyns.ondigitalocean.app/mcp
    ```
 5. → Speichern
 
@@ -240,7 +240,7 @@ Request: Create a PowerPoint presentation
 Schritt für Schritt:
 
 - [ ] **Step 1**: DigitalOcean App Platform öffnen
-- [ ] **Step 2**: App `remote-mcp-server-8h8cr` auswählen
+- [ ] **Step 2**: App `mcp-bus-suyns` auswählen
 - [ ] **Step 3**: Actions → Force Rebuild and Deploy
 - [ ] **Step 4**: Warte auf "Live" Status
 - [ ] **Step 5**: Runtime Logs → "Skills loaded: 6" ✅
@@ -256,7 +256,7 @@ Schritt für Schritt:
 
 ### Schritt 1: App finden
 ```
-DigitalOcean Dashboard → Apps → remote-mcp-server-8h8cr
+DigitalOcean Dashboard → Apps → mcp-bus-suyns
 ```
 
 ### Schritt 2: Force Rebuild

@@ -340,7 +340,7 @@ Erstellt SEO-optimierte Blog-Artikel.
 Der Skill-Router analysiert Ihre Anfrage automatisch und wählt die richtigen Skills:
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/route \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/route \
   -H "Content-Type: application/json" \
   -d '{
     "user_request": "Erstelle mir eine PowerPoint über unser neues Produkt"
@@ -373,7 +373,7 @@ curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/route \
 ### Direktes Tool-Execution
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "create_word",

@@ -1,9 +1,9 @@
-name: remote-mcp-server
+name: mcp-bus
 region: fra
 services:
-  - name: remote-mcp-server
+  - name: mcp-bus
     github:
-      repo: estkae/remote-mcp-server
+      repo: estkae/mcp-bus
       branch: main
       deploy_on_push: true
 
@@ -30,7 +30,7 @@ services:
         value: "8080"
 
       - key: SERVER_URL
-        value: https://remote-mcp-server-8h8cr.ondigitalocean.app
+        value: https://mcp-bus-suyns.ondigitalocean.app
 
       - key: OUTPUT_DIR
         value: /tmp/output

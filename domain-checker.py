@@ -8,7 +8,7 @@ availability checking capabilities.
 
 DEPLOYMENT WORKFLOW:
 1. Deploy this server to DigitalOcean using the one-click deploy button
-2. Get the deployed URL from DigitalOcean (e.g., https://remote-mcp-server-8h8cr.ondigitalocean.app)
+2. Get the deployed URL from DigitalOcean (e.g., https://mcp-bus-suyns.ondigitalocean.app)
 3. Use that URL + /mcp in your MCP client configuration:
    - Claude Desktop/Code
    - Cursor
@@ -19,7 +19,7 @@ Example MCP client configuration:
 {
   "mcpServers": {
     "domain-checker": {
-      "url": "https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp",
+      "url": "https://mcp-bus-suyns.ondigitalocean.app/mcp",
       "description": "Check domain availability"
     }
   }

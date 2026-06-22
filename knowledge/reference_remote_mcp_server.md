@@ -6,7 +6,7 @@ originSessionId: 6f93612f-cc5c-4e16-82d6-5ac4c36f21e1
 ---
 # Remote MCP Server (DigitalOcean)
 
-- URL: `https://remote-mcp-server-8h8cr.ondigitalocean.app`
+- URL: `https://mcp-bus-suyns.ondigitalocean.app`
 - Repo: `estkae/remote-mcp-server` (DigitalOcean deployed)
 - Version 2.1.0, 8 Skills geladen
 - Liefert Office-Tools an pageindex-service + andere Apps
@@ -25,9 +25,9 @@ originSessionId: 6f93612f-cc5c-4e16-82d6-5ac4c36f21e1
 
 ## ENV-Variable
 
-**Richtig:** `REMOTE_MCP_SERVER_URL=https://remote-mcp-server-8h8cr.ondigitalocean.app`
+**Richtig:** `REMOTE_MCP_SERVER_URL=https://mcp-bus-suyns.ondigitalocean.app`
 
-**Falsch (verursacht 404):** `REMOTE_MCP_SERVER_URL=https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp`
+**Falsch (verursacht 404):** `REMOTE_MCP_SERVER_URL=https://mcp-bus-suyns.ondigitalocean.app/mcp`
 
 Der Code macht `fetch(${REMOTE_MCP_SERVER_URL}/execute)` — mit /mcp-Suffix wird daraus
 `.../mcp/execute` was nicht existiert, Server liefert 404 "Not Found".

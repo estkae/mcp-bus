@@ -52,7 +52,15 @@ try {
   databaseTools = null;
 }
 
-
+// Scanner Skill Integration
+let scannerSkill;
+try {
+  scannerSkill = require('./skills/scanner-skill');
+  console.log('✅ Scanner Skill loaded (local service proxy)');
+} catch (error) {
+  console.log('⚠️  Scanner Skill not available:', error.message);
+  scannerSkill = null;
+}
 
 // Skill-Definitionen laden
 let skillDefinitions = null;
@@ -309,7 +317,7 @@ app.get('/', (req, res) => {
       'GET /health': 'Health check'
     },
     deployed_on: 'DigitalOcean',
-    url: 'https://remote-mcp-server-8h8cr.ondigitalocean.app'
+    url: 'https://mcp-bus-suyns.ondigitalocean.app'
   });
 });
 
@@ -395,6 +403,41 @@ app.post('/route', async (req, res) => {
   }
 });
 
+// POST /scanner - Scanner Skill Befehl ($scanner)
+app.post('/scanner', async (req, res) => {
+  const { command, args } = req.body;
+
+  console.log(`📷 Scanner command: ${command}`);
+
+  if (!scannerSkill) {
+    return res.status(503).json({
+      error: 'Scanner Skill nicht verfügbar',
+      hint: 'Scanner-Modul konnte nicht geladen werden'
+    });
+  }
+
+  try {
+    const result = await scannerSkill.handleScannerCommand(command, args || {});
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /scanner/status - Scanner Service Status
+app.get('/scanner/status', async (req, res) => {
+  if (!scannerSkill) {
+    return res.status(503).json({ status: 'unavailable' });
+  }
+
+  try {
+    const status = await scannerSkill.checkScannerService();
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // POST /execute - Tool ausführen
 app.post('/execute', async (req, res) => {
   const { tool, parameters } = req.body;
@@ -458,6 +501,9 @@ app.post('/execute', async (req, res) => {
         case 'kerio_send_email':
           result = await kerioConnector.sendEmail(parameters);
           break;
+        case 'kerio_send_email_with_attachment':
+          result = await kerioConnector.sendEmailWithAttachment(parameters);
+          break;
         case 'kerio_search_emails':
           result = await kerioConnector.searchEmails(parameters);
           break;
@@ -467,6 +513,16 @@ app.post('/execute', async (req, res) => {
         default:
           throw new Error('Unknown Kerio tool: ' + tool);
       }
+    } else if (scannerSkill && [
+      'list_scanners', 'scan_document', 'ocr_document',
+      'create_scan_pdf', 'summarize_scan', 'send_scan_email'
+    ].includes(tool)) {
+      // Scanner Skill - Proxy zum lokalen Service
+      const scanResult = await scannerSkill.executeScannerTool(tool, parameters);
+      if (scanResult.error) {
+        throw new Error(scanResult.message || 'Scanner-Fehler');
+      }
+      result = scanResult.result;
     } else if (databaseTools && [
       'connect_database', 'disconnect_database', 'execute_query', 'list_tables',
       'describe_table', 'list_active_connections', 'disconnect_all_databases',
@@ -806,6 +862,9 @@ app.post('/mcp', async (req, res) => {
             case 'kerio_send_email':
               toolResult = await kerioConnector.sendEmail(toolArgs);
               break;
+            case 'kerio_send_email_with_attachment':
+              toolResult = await kerioConnector.sendEmailWithAttachment(toolArgs);
+              break;
             case 'kerio_search_emails':
               toolResult = await kerioConnector.searchEmails(toolArgs);
               break;
@@ -815,6 +874,16 @@ app.post('/mcp', async (req, res) => {
             default:
               throw new Error('Unknown Kerio tool: ' + toolName);
           }
+        } else if (scannerSkill && [
+          'list_scanners', 'scan_document', 'ocr_document',
+          'create_scan_pdf', 'summarize_scan', 'send_scan_email'
+        ].includes(toolName)) {
+          // Scanner Skill - Proxy zum lokalen Service
+          const scanResult = await scannerSkill.executeScannerTool(toolName, toolArgs);
+          if (scanResult.error) {
+            throw new Error(scanResult.message || 'Scanner-Fehler');
+          }
+          toolResult = scanResult.result;
         } else if (databaseTools && [
           'connect_database', 'disconnect_database', 'execute_query', 'list_tables',
           'describe_table', 'list_active_connections', 'disconnect_all_databases',

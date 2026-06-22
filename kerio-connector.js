@@ -305,6 +305,83 @@ async function sendEmail(params) {
 }
 
 /**
+ * Send email with attachments via SMTP
+ * Attachments should be array of: { filename, content (base64), contentType, encoding }
+ */
+async function sendEmailWithAttachment(params) {
+  if (!isKerioConfigured()) {
+    throw new Error('Kerio Connect not configured');
+  }
+
+  const {
+    to,
+    subject,
+    text,
+    html,
+    cc,
+    bcc,
+    attachments = [],
+    saveCopyToSent = true,
+    sentFolder = 'Sent'
+  } = params;
+
+  const transporter = nodemailer.createTransport({
+    host: KERIO_CONFIG.host,
+    port: KERIO_CONFIG.smtpPort,
+    secure: true,
+    auth: {
+      user: KERIO_CONFIG.username,
+      pass: KERIO_CONFIG.password
+    }
+  });
+
+  const now = new Date();
+
+  // Konvertiere Attachments für nodemailer
+  const nodemailerAttachments = attachments.map(att => ({
+    filename: att.filename,
+    content: Buffer.from(att.content, att.encoding || 'base64'),
+    contentType: att.contentType || 'application/octet-stream'
+  }));
+
+  const mailOptions = {
+    from: KERIO_CONFIG.username,
+    to,
+    subject,
+    text,
+    html,
+    cc,
+    bcc,
+    date: now,
+    attachments: nodemailerAttachments
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`📧 Email with ${attachments.length} attachment(s) sent via SMTP, MessageID: ${info.messageId}`);
+
+    if (saveCopyToSent) {
+      try {
+        await saveToSentFolder(mailOptions, sentFolder);
+        console.log(`📧 Email copy saved to ${sentFolder} folder`);
+      } catch (sentError) {
+        console.error(`⚠️  Failed to save to sent folder: ${sentError.message}`);
+      }
+    }
+
+    return {
+      success: true,
+      messageId: info.messageId,
+      message: `Email with ${attachments.length} attachment(s) sent successfully to ${to}`,
+      attachmentCount: attachments.length,
+      savedToSent: saveCopyToSent
+    };
+  } catch (error) {
+    throw new Error(`Failed to send email with attachment: ${error.message}`);
+  }
+}
+
+/**
  * Save email copy to Sent folder via IMAP
  */
 async function saveToSentFolder(mailOptions, sentFolder) {
@@ -672,6 +749,72 @@ const KERIO_TOOLS = [
       type: "object",
       properties: {}
     }
+  },
+  {
+    name: "kerio_send_email_with_attachment",
+    description: "📎 Sende Email mit Anhängen (z.B. PDF, Bilder) via Kerio Connect SMTP",
+    input_schema: {
+      type: "object",
+      properties: {
+        to: {
+          type: "string",
+          description: "Recipient email address"
+        },
+        subject: {
+          type: "string",
+          description: "Email subject"
+        },
+        text: {
+          type: "string",
+          description: "Plain text body"
+        },
+        html: {
+          type: "string",
+          description: "HTML body (optional)"
+        },
+        cc: {
+          type: "string",
+          description: "CC recipients (optional)"
+        },
+        bcc: {
+          type: "string",
+          description: "BCC recipients (optional)"
+        },
+        attachments: {
+          type: "array",
+          description: "Array of attachments: [{filename, content (base64), contentType, encoding}]",
+          items: {
+            type: "object",
+            properties: {
+              filename: {
+                type: "string",
+                description: "Filename for the attachment"
+              },
+              content: {
+                type: "string",
+                description: "Base64-encoded file content"
+              },
+              contentType: {
+                type: "string",
+                description: "MIME type (e.g. application/pdf, image/png)"
+              },
+              encoding: {
+                type: "string",
+                description: "Encoding (default: base64)",
+                default: "base64"
+              }
+            },
+            required: ["filename", "content"]
+          }
+        },
+        saveCopyToSent: {
+          type: "boolean",
+          description: "Save copy to Sent folder (default: true)",
+          default: true
+        }
+      },
+      required: ["to", "subject", "attachments"]
+    }
   }
 ];
 
@@ -682,6 +825,7 @@ module.exports = {
   listEmails,
   readEmail,
   sendEmail,
+  sendEmailWithAttachment,
   searchEmails,
   listFolders
 };

@@ -47,7 +47,7 @@
 
 | Variable Name | Typ | Erforderlich | Standard-Wert | Beispiel | Beschreibung |
 |--------------|-----|--------------|---------------|----------|--------------|
-| `REMOTE_MCP_SERVER_URL` | String | ❌ Optional | - | `https://remote-mcp-server-8h8cr.ondigitalocean.app` | URL des Remote MCP Servers |
+| `REMOTE_MCP_SERVER_URL` | String | ❌ Optional | - | `https://mcp-bus-suyns.ondigitalocean.app` | URL des Remote MCP Servers |
 
 ---
 
@@ -95,7 +95,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-...
 Nach dem Deployment prüfen Sie:
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/
+curl https://mcp-bus-suyns.ondigitalocean.app/
 
 # Sollte zeigen:
 # "features": [
@@ -106,7 +106,7 @@ curl https://remote-mcp-server-8h8cr.ondigitalocean.app/
 
 Kerio Tools überprüfen:
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/tools | grep kerio
+curl https://mcp-bus-suyns.ondigitalocean.app/tools | grep kerio
 
 # Sollte 4 Kerio Tools zeigen:
 # kerio_list_emails

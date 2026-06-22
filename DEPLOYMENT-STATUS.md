@@ -53,7 +53,7 @@ doctl apps list-deployments [APP-ID]
 
 ### 1. Health Check
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
+curl https://mcp-bus-suyns.ondigitalocean.app/health
 ```
 
 Erwartete Antwort:
@@ -67,14 +67,14 @@ Erwartete Antwort:
 
 ### 2. Kerio Tools prüfen
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/tools
+curl https://mcp-bus-suyns.ondigitalocean.app/tools
 ```
 
 Sollte `kerio_send_email` mit neuen Parametern und `kerio_list_folders` enthalten.
 
 ### 3. Test-Mail senden
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "kerio_send_email",
@@ -88,7 +88,7 @@ curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
 
 ### 4. Ordner auflisten
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "kerio_list_folders",

@@ -1,7 +1,7 @@
 {
-  "name": "remote-mcp-server",
+  "name": "mcp-bus",
   "version": "2.1.0",
-  "description": "Remote MCP Server with Skill-Routing + Kerio Connect Integration",
+  "description": "MCP-Bus (ehem. remote-mcp-server) – zentraler MCP-Server mit Skill-Routing, Universal-DB-Wrapper, Intent-Engine + Kerio Connect Integration",
   "main": "remote-mcp-server-with-skills.js",
   "scripts": {
     "start": "node remote-mcp-server-with-skills.js"

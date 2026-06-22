@@ -8,7 +8,7 @@ Gehen Sie zu: https://cloud.digitalocean.com/apps
 
 ### Schritt 2: Environment Variable setzen
 
-1. Klicken Sie auf Ihre App: **remote-mcp-server-8h8cr**
+1. Klicken Sie auf Ihre App: **mcp-bus-suyns**
 2. Navigieren Sie zu: **Settings** → **App-Level Environment Variables**
 3. Klicken Sie auf **Edit**
 4. Fügen Sie hinzu:
@@ -31,7 +31,7 @@ Die App wird automatisch neu deployed. Warten Sie ca. 2-3 Minuten.
 Testen Sie, ob Production Mode aktiv ist:
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
+curl https://mcp-bus-suyns.ondigitalocean.app/health
 ```
 
 **Erwartete Response:**
@@ -49,7 +49,7 @@ curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
 ## 🎯 Erste PowerPoint erstellen
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "create_powerpoint",

@@ -30,7 +30,7 @@ class TypeDBCloudConnector {
     }
 
     this.client = null;
-    this.database = 'meeting_knowledge';
+    this.database = config.database || process.env.TYPEDB_DATABASE || 'meeting_knowledge';
   }
 
   /**

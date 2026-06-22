@@ -5,6 +5,9 @@ node_modules/
 .env
 .env.local
 .env.*.local
+ev-mcp
+ev-mcp.*
+*.env
 
 # OS files
 .DS_Store

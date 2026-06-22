@@ -14,7 +14,7 @@ Der Remote MCP Server unterstützt zwei Modi:
 ### Methode 1: DigitalOcean Environment Variable (Empfohlen)
 
 1. Öffnen Sie: https://cloud.digitalocean.com/apps
-2. Wählen Sie Ihre App: `remote-mcp-server-8h8cr`
+2. Wählen Sie Ihre App: `mcp-bus-suyns`
 3. Navigieren Sie zu: **Settings** → **App-Level Environment Variables**
 4. Fügen Sie hinzu:
    ```
@@ -455,7 +455,7 @@ Bei Problemen oder Fragen:
 
 2. **Health Check:**
    ```bash
-   curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
+   curl https://mcp-bus-suyns.ondigitalocean.app/health
    ```
 
 3. **Issues:** https://github.com/aals-software/remote-mcp-server/issues

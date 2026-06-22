@@ -16,7 +16,7 @@ KERIO_USE_SSL=true
 ## 1. Health Check (sofort testbar)
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
+curl https://mcp-bus-suyns.ondigitalocean.app/health
 ```
 
 **Erwartete Antwort:**
@@ -31,7 +31,7 @@ curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
 ## 2. Tools prüfen
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/tools
+curl https://mcp-bus-suyns.ondigitalocean.app/tools
 ```
 
 **Erwartete Tools:**
@@ -44,7 +44,7 @@ curl https://remote-mcp-server-8h8cr.ondigitalocean.app/tools
 ## 3. Ordner auflisten (NEU!)
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "kerio_list_folders",
@@ -72,7 +72,7 @@ curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
 ## 4. Test-Mail senden
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "kerio_send_email",
@@ -104,7 +104,7 @@ curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
 ## 5. Gesendet-Ordner prüfen
 
 ```bash
-curl -X POST https://remote-mcp-server-8h8cr.ondigitalocean.app/execute \
+curl -X POST https://mcp-bus-suyns.ondigitalocean.app/execute \
   -H "Content-Type: application/json" \
   -d '{
     "tool": "kerio_list_emails",

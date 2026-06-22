@@ -15,10 +15,10 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class TypeDBConnector {
-  constructor(host = 'localhost:1729') {
+  constructor(host = 'localhost:1729', database = null) {
     this.host = host;
     this.client = null;
-    this.database = 'meeting_knowledge';
+    this.database = database || process.env.TYPEDB_DATABASE || 'meeting_knowledge';
   }
 
   /**

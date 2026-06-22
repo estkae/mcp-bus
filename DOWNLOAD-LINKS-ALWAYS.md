@@ -17,7 +17,7 @@ Dieses System generiert **IMMER echte Download-Links** für Office-Dateien.
   "success": true,
   "filename": "presentation.pptx",
   "file_size": "75.64 KB",
-  "download_url": "https://remote-mcp-server-8h8cr.ondigitalocean.app/download/abc123...",
+  "download_url": "https://mcp-bus-suyns.ondigitalocean.app/download/abc123...",
   "download_token": "abc123...",
   "download_expires_at": "2025-10-28T13:30:53.415Z",
   "download_expires_in": "60 Minuten"
@@ -113,7 +113,7 @@ interface OfficeToolResponse {
   file_size: string;               // '75.64 KB'
 
   // Download-Infos - IMMER vorhanden!
-  download_url: string;            // 'https://remote-mcp-server-8h8cr.ondigitalocean.app/download/token...'
+  download_url: string;            // 'https://mcp-bus-suyns.ondigitalocean.app/download/token...'
   download_token: string;          // 'abc123...'
   download_expires_at: string;     // ISO DateTime
   download_expires_in: string;     // '60 Minuten'
@@ -141,7 +141,7 @@ Wenn du eine Antwort an den User generierst, verwende:
    • Slides: 6
 
 📥 **Download-Link:**
-   https://remote-mcp-server-8h8cr.ondigitalocean.app/download/abc123...
+   https://mcp-bus-suyns.ondigitalocean.app/download/abc123...
 
 ⏰ Link gültig für: 60 Minuten
 🔒 Max Downloads: 10
@@ -206,10 +206,10 @@ console.log('SERVER_URL:', process.env.SERVER_URL);
 **Lösung:**
 ```bash
 # Teste Download-Endpoint
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/files
+curl https://mcp-bus-suyns.ondigitalocean.app/files
 
 # Teste Token-Info
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/download/TOKEN/info
+curl https://mcp-bus-suyns.ondigitalocean.app/download/TOKEN/info
 ```
 
 ---

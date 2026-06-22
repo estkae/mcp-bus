@@ -13,7 +13,7 @@ echo "📦 App ID: $APP_ID"
 echo "🔧 Setze SERVER_URL..."
 
 # Environment Variable setzen
-doctl apps update $APP_ID --env "SERVER_URL=https://remote-mcp-server-8h8cr.ondigitalocean.app"
+doctl apps update $APP_ID --env "SERVER_URL=https://mcp-bus-suyns.ondigitalocean.app"
 
 echo "✅ Environment Variable gesetzt"
 echo "⏳ App wird neu deployed..."

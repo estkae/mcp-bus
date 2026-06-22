@@ -522,6 +522,151 @@
           }
         }
       ]
+    },
+    {
+      "id": "scanner",
+      "name": "Scanner Skill",
+      "description": "Scannt Dokumente, führt OCR aus und versendet per Email",
+      "keywords": [
+        "scanner",
+        "scan",
+        "scannen",
+        "dokument scannen",
+        "ocr",
+        "texterkennung",
+        "einlesen",
+        "digitalisieren",
+        "pdf scan",
+        "scan to email",
+        "scan to mail"
+      ],
+      "localService": {
+        "url": "http://localhost:8085",
+        "startCommand": "cd scanner && npm start",
+        "healthEndpoint": "/health"
+      },
+      "tools": [
+        {
+          "name": "list_scanners",
+          "description": "Liste alle verfügbaren Scanner auf diesem Computer",
+          "input_schema": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "scan_document",
+          "description": "Starte einen Dokument-Scan",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "scannerId": {
+                "type": "string",
+                "description": "ID des Scanners"
+              },
+              "resolution": {
+                "type": "number",
+                "description": "Auflösung in DPI (150, 300, 600)",
+                "default": 300
+              },
+              "colorMode": {
+                "type": "string",
+                "enum": ["color", "grayscale", "blackwhite"],
+                "description": "Farbmodus",
+                "default": "color"
+              }
+            }
+          }
+        },
+        {
+          "name": "ocr_document",
+          "description": "Führe OCR (Texterkennung) auf einem gescannten Dokument aus",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "type": "string",
+                "description": "Scan-Session ID"
+              },
+              "languages": {
+                "type": "string",
+                "description": "OCR-Sprachen (z.B. 'deu', 'eng', 'deu+eng', 'deu+eng+fra+ita')",
+                "default": "deu+eng"
+              }
+            },
+            "required": ["sessionId"]
+          }
+        },
+        {
+          "name": "create_scan_pdf",
+          "description": "Erstelle PDF aus gescannten Bildern",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "type": "string",
+                "description": "Scan-Session ID"
+              },
+              "title": {
+                "type": "string",
+                "description": "PDF-Titel"
+              }
+            },
+            "required": ["sessionId"]
+          }
+        },
+        {
+          "name": "summarize_scan",
+          "description": "Generiere KI-Zusammenfassung des gescannten Dokuments",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "type": "string",
+                "description": "Scan-Session ID"
+              },
+              "language": {
+                "type": "string",
+                "description": "Sprache der Zusammenfassung (de/en)",
+                "default": "de"
+              }
+            },
+            "required": ["sessionId"]
+          }
+        },
+        {
+          "name": "send_scan_email",
+          "description": "Sende gescanntes Dokument per Email",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "sessionId": {
+                "type": "string",
+                "description": "Scan-Session ID"
+              },
+              "to": {
+                "type": "string",
+                "description": "Empfänger Email-Adresse"
+              },
+              "subject": {
+                "type": "string",
+                "description": "Email-Betreff",
+                "default": "Gescanntes Dokument"
+              },
+              "message": {
+                "type": "string",
+                "description": "Nachricht im Email-Body"
+              },
+              "includeSummary": {
+                "type": "boolean",
+                "description": "Zusammenfassung in Email einfügen",
+                "default": false
+              }
+            },
+            "required": ["sessionId", "to"]
+          }
+        }
+      ]
     }
   ]
 }

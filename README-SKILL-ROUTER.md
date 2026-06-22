@@ -3,7 +3,7 @@
 ## ✅ Status
 
 - **Repository**: https://github.com/estkae/remote-mcp-server
-- **Deployed URL**: https://remote-mcp-server-8h8cr.ondigitalocean.app
+- **Deployed URL**: https://mcp-bus-suyns.ondigitalocean.app
 - **Commit**: df10110
 - **Status**: ✅ **Gepusht - Auto-Deploy läuft!**
 
@@ -46,14 +46,14 @@ Token-optimierter MCP Server mit intelligentem Skill-Routing:
    - Prüft `Procfile` → Findet: `python skill-router.py`
 4. 🚀 **Deploy Phase**:
    - Startet Server auf Port 8080
-   - Server läuft auf: https://remote-mcp-server-8h8cr.ondigitalocean.app
+   - Server läuft auf: https://mcp-bus-suyns.ondigitalocean.app
 
 ### Deployment Status prüfen
 
 **Option 1: DigitalOcean Dashboard**
 ```
 1. Öffne: https://cloud.digitalocean.com/apps
-2. Klicke auf: remote-mcp-server-8h8cr
+2. Klicke auf: mcp-bus-suyns
 3. → Deployments Tab
 4. Siehst du: "Building" oder "Deploying" → Warten
 5. Wenn "Live": ✅ Fertig!
@@ -81,7 +81,7 @@ Token-optimierter MCP Server mit intelligentem Skill-Routing:
 ### Test 1: Health Check
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
+curl https://mcp-bus-suyns.ondigitalocean.app/health
 ```
 
 **Erwartete Antwort:**
@@ -94,7 +94,7 @@ curl https://remote-mcp-server-8h8cr.ondigitalocean.app/health
 ### Test 2: MCP Tools abrufen
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp/tools
+curl https://mcp-bus-suyns.ondigitalocean.app/mcp/tools
 ```
 
 **Erwartete Tools:**
@@ -108,7 +108,7 @@ In Ihrer Claude-Webapp:
 
 **Schritt 1**: Settings → MCP Server URL prüfen
 ```
-https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp
+https://mcp-bus-suyns.ondigitalocean.app/mcp
 ```
 
 **Schritt 2**: Testen
@@ -203,7 +203,7 @@ Kosten: 1M × $0.000003 = $3.00/Monat
 ```
 ┌─────────────────────────────────────────────┐
 │  DigitalOcean App Platform                  │
-│  https://remote-mcp-server-8h8cr....app     │
+│  https://mcp-bus-suyns....app     │
 │                                             │
 │  ┌───────────────────────────────────────┐ │
 │  │  skill-router.py                      │ │
@@ -320,7 +320,7 @@ dnspython
 
 **Symptom:**
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/mcp
+curl https://mcp-bus-suyns.ondigitalocean.app/mcp
 → 404 Not Found
 ```
 

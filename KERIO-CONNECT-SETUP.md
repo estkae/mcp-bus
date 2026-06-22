@@ -223,7 +223,7 @@ Force Rebuild der remote-mcp-server App
 ### Schritt 3: Tools überprüfen
 
 ```bash
-curl https://remote-mcp-server-8h8cr.ondigitalocean.app/tools
+curl https://mcp-bus-suyns.ondigitalocean.app/tools
 ```
 
 Sie sollten 4 Kerio Tools sehen:
