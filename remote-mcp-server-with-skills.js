@@ -723,8 +723,9 @@ app.get('/kerio-test', async (req, res) => {
 });
 
 // ==================== MCP PROTOCOL ENDPOINT ====================
-// POST /mcp - MCP Protocol Handler für Claude Desktop Integration
-app.post('/mcp', async (req, res) => {
+// POST /mcp - ALTER POST-only-Handler (deaktiviert; ersetzt durch Streamable HTTP via SDK in setupMcpStreamable).
+// Pfad umbenannt, damit er nicht mehr matcht; Code bleibt als Referenz erhalten.
+app.post('/mcp__legacy_disabled', async (req, res) => {
   const message = req.body;
   console.log(`📨 MCP Request: ${message.method}`);
 
@@ -953,9 +954,130 @@ app.post('/check-domain', async (req, res) => {
   });
 });
 
+// ── MCP Streamable HTTP (offizielles SDK) — Claude Desktop Connector ──────────
+// Ersetzt den alten POST-only-/mcp-Handler. /execute & alle Skills bleiben unberührt.
+function buildToolList() {
+  const allTools = [routerTool];
+  const ppt = skillDefinitions.skills.find(s => s.id === 'powerpoint')?.tools[0];
+  const xls = skillDefinitions.skills.find(s => s.id === 'excel')?.tools[0];
+  const doc = skillDefinitions.skills.find(s => s.id === 'word')?.tools[0];
+  const pdfTool = skillDefinitions.skills.find(s => s.id === 'pdf-creator')?.tools[0];
+  if (ppt) allTools.push(ppt);
+  if (xls) allTools.push(xls);
+  if (doc) allTools.push(doc);
+  if (pdfTool) allTools.push(pdfTool);
+  if (kerioConnector && kerioConnector.isKerioConfigured()) allTools.push(...kerioConnector.KERIO_TOOLS);
+  if (databaseTools) allTools.push(...databaseTools.DATABASE_TOOLS);
+  return allTools;
+}
+
+async function executeMcpTool(toolName, toolArgs = {}) {
+  if (toolName === 'skill_router') return selectSkills(toolArgs.user_request, toolArgs.context);
+  if (['create_powerpoint', 'create_powerpoint_presentation'].includes(toolName)) {
+    if (!officeTools) throw new Error('Office Tools not available');
+    return await officeTools.createPowerPoint(toolArgs);
+  }
+  if (['create_excel', 'create_excel_spreadsheet'].includes(toolName)) {
+    if (!officeTools) throw new Error('Office Tools not available');
+    return await officeTools.createExcel(toolArgs);
+  }
+  if (['create_word', 'create_word_document'].includes(toolName)) {
+    if (!officeTools) throw new Error('Office Tools not available');
+    return await officeTools.createWord(toolArgs);
+  }
+  if (['create_pdf', 'create_pdf_document'].includes(toolName)) {
+    if (!officeTools) throw new Error('Office Tools not available');
+    return await officeTools.createPDF(toolArgs);
+  }
+  if (toolName.startsWith('kerio_')) {
+    if (!kerioConnector) throw new Error('Kerio Connect module not loaded');
+    if (!kerioConnector.isKerioConfigured()) throw new Error('Kerio Connect not configured (KERIO_HOST/USERNAME/PASSWORD)');
+    switch (toolName) {
+      case 'kerio_list_emails': return await kerioConnector.listEmails(toolArgs);
+      case 'kerio_read_email': return await kerioConnector.readEmail(toolArgs);
+      case 'kerio_send_email': return await kerioConnector.sendEmail(toolArgs);
+      case 'kerio_send_email_with_attachment': return await kerioConnector.sendEmailWithAttachment(toolArgs);
+      case 'kerio_search_emails': return await kerioConnector.searchEmails(toolArgs);
+      case 'kerio_list_folders': return await kerioConnector.listFolders();
+      default: throw new Error('Unknown Kerio tool: ' + toolName);
+    }
+  }
+  if (scannerSkill && ['list_scanners', 'scan_document', 'ocr_document', 'create_scan_pdf', 'summarize_scan', 'send_scan_email'].includes(toolName)) {
+    const scanResult = await scannerSkill.executeScannerTool(toolName, toolArgs);
+    if (scanResult.error) throw new Error(scanResult.message || 'Scanner-Fehler');
+    return scanResult.result;
+  }
+  if (databaseTools && ['connect_database', 'disconnect_database', 'execute_query', 'list_tables', 'describe_table', 'list_active_connections', 'disconnect_all_databases', 'save_connection_config', 'load_connection_config', 'list_connection_configs', 'delete_connection_config', 'test_database_connection', 'export_query_results'].includes(toolName)) {
+    return await databaseTools.handleDatabaseTool(toolName, toolArgs);
+  }
+  return await simulateToolExecution(toolName, toolArgs);
+}
+
+const mcpTransports = {};
+async function setupMcpStreamable(app) {
+  try {
+    const { Server } = await import('@modelcontextprotocol/sdk/server/index.js');
+    const { StreamableHTTPServerTransport } = await import('@modelcontextprotocol/sdk/server/streamableHttp.js');
+    const { ListToolsRequestSchema, CallToolRequestSchema, isInitializeRequest } = await import('@modelcontextprotocol/sdk/types.js');
+    const { randomUUID } = require('crypto');
+
+    const buildMcpServer = () => {
+      const server = new Server({ name: 'mcp-bus', version: '2.1.0' }, { capabilities: { tools: {} } });
+      server.setRequestHandler(ListToolsRequestSchema, async () => ({
+        tools: buildToolList().map(t => ({ name: t.name, description: t.description, inputSchema: t.input_schema }))
+      }));
+      server.setRequestHandler(CallToolRequestSchema, async (reqMsg) => {
+        const result = await executeMcpTool(reqMsg.params.name, reqMsg.params.arguments || {});
+        return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+      });
+      return server;
+    };
+
+    app.post('/mcp', async (req, res) => {
+      try {
+        const sid = req.headers['mcp-session-id'];
+        let transport;
+        if (sid && mcpTransports[sid]) {
+          transport = mcpTransports[sid];
+        } else if (!sid && isInitializeRequest(req.body)) {
+          transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+            enableDnsRebindingProtection: false,
+            onsessioninitialized: (id) => { mcpTransports[id] = transport; }
+          });
+          transport.onclose = () => { if (transport.sessionId) delete mcpTransports[transport.sessionId]; };
+          await buildMcpServer().connect(transport);
+        } else {
+          res.status(400).json({ jsonrpc: '2.0', error: { code: -32000, message: 'Bad Request: keine gültige Session-ID' }, id: null });
+          return;
+        }
+        await transport.handleRequest(req, res, req.body);
+      } catch (err) {
+        if (!res.headersSent) res.status(500).json({ jsonrpc: '2.0', error: { code: -32603, message: String(err && err.message || err) }, id: null });
+      }
+    });
+
+    const mcpSession = async (req, res) => {
+      const sid = req.headers['mcp-session-id'];
+      if (sid && mcpTransports[sid]) { await mcpTransports[sid].handleRequest(req, res); return; }
+      if (req.method === 'GET') {
+        res.status(200).type('text/plain').send('MCP-Bus läuft (Streamable HTTP). Bitte als MCP-Client/Connector verbinden, nicht im Browser.');
+        return;
+      }
+      res.status(400).send('Ungültige oder fehlende Session-ID');
+    };
+    app.get('/mcp', mcpSession);
+    app.delete('/mcp', mcpSession);
+    console.log('✅ MCP Streamable HTTP (/mcp) aktiv (offizielles SDK)');
+  } catch (e) {
+    console.error('❌ MCP Streamable HTTP Setup fehlgeschlagen (Rest des Bus läuft weiter):', e && e.message || e);
+  }
+}
+
 // Server starten
 async function start() {
   await loadSkillDefinitions();
+  await setupMcpStreamable(app);
 
   app.listen(PORT, () => {
     console.log(`\n╔════════════════════════════════════════════════╗`);
