@@ -52,6 +52,16 @@ try {
   databaseTools = null;
 }
 
+// AMS Connector (Sitzung/Protokoll → pageindex-service meeting-agent)
+let amsConnector;
+try {
+  amsConnector = require('./ams-connector');
+  console.log(`✅ AMS Connector loaded (${amsConnector.AMS_BASE})`);
+} catch (error) {
+  console.log('⚠️  AMS Connector not available:', error.message);
+  amsConnector = null;
+}
+
 // Scanner Skill Integration
 let scannerSkill;
 try {
@@ -531,6 +541,9 @@ app.post('/execute', async (req, res) => {
     ].includes(tool)) {
       // Database Tools
       result = await databaseTools.handleDatabaseTool(tool, parameters);
+    } else if (amsConnector && amsConnector.isAmsTool(tool)) {
+      // AMS Meeting-Agent (Sitzung/Protokoll) — nur Trigger/Status über den Bus
+      result = await amsConnector.executeAmsTool(tool, parameters);
     } else {
       // Simuliere Tool-Ausführung (in Produktion: delegiere an spezialisierte Services)
       result = await simulateToolExecution(tool, parameters);
@@ -968,6 +981,7 @@ function buildToolList() {
   if (pdfTool) allTools.push(pdfTool);
   if (kerioConnector && kerioConnector.isKerioConfigured()) allTools.push(...kerioConnector.KERIO_TOOLS);
   if (databaseTools) allTools.push(...databaseTools.DATABASE_TOOLS);
+  if (amsConnector) allTools.push(...amsConnector.AMS_TOOLS);
   return allTools;
 }
 
@@ -1009,6 +1023,9 @@ async function executeMcpTool(toolName, toolArgs = {}) {
   }
   if (databaseTools && ['connect_database', 'disconnect_database', 'execute_query', 'list_tables', 'describe_table', 'list_active_connections', 'disconnect_all_databases', 'save_connection_config', 'load_connection_config', 'list_connection_configs', 'delete_connection_config', 'test_database_connection', 'export_query_results'].includes(toolName)) {
     return await databaseTools.handleDatabaseTool(toolName, toolArgs);
+  }
+  if (amsConnector && amsConnector.isAmsTool(toolName)) {
+    return await amsConnector.executeAmsTool(toolName, toolArgs);
   }
   return await simulateToolExecution(toolName, toolArgs);
 }
