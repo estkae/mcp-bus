@@ -72,6 +72,16 @@ try {
   scannerSkill = null;
 }
 
+// GEVER-Connector (eCH-0160 Migrations-Schnittstelle)
+let geverConnector;
+try {
+  geverConnector = require('./gever-connector');
+  console.log(`✅ GEVER Connector loaded (eCH-0160${geverConnector.BACKEND_URL ? `, proxy → ${geverConnector.BACKEND_URL}` : ', local parse'})`);
+} catch (error) {
+  console.log('⚠️  GEVER Connector not available:', error.message);
+  geverConnector = null;
+}
+
 // Skill-Definitionen laden
 let skillDefinitions = null;
 
@@ -356,7 +366,12 @@ app.get('/tools', (req, res) => {
     tools.push(...databaseTools.DATABASE_TOOLS);
   }
 
-  console.log(`📋 /tools - Returning ${tools.length} tools (Router + Office + Kerio + Database)`);
+  // Add GEVER tools (eCH-0160 Migration)
+  if (geverConnector) {
+    tools.push(...geverConnector.GEVER_TOOLS);
+  }
+
+  console.log(`📋 /tools - Returning ${tools.length} tools (Router + Office + Kerio + Database + GEVER)`);
   res.json(tools);
 });
 
@@ -544,6 +559,9 @@ app.post('/execute', async (req, res) => {
     } else if (amsConnector && amsConnector.isAmsTool(tool)) {
       // AMS Meeting-Agent (Sitzung/Protokoll) — nur Trigger/Status über den Bus
       result = await amsConnector.executeAmsTool(tool, parameters);
+    } else if (geverConnector && geverConnector.isGeverTool(tool)) {
+      // GEVER eCH-0160 Migrations-Schnittstelle
+      result = await geverConnector.executeGeverTool(tool, parameters);
     } else {
       // Simuliere Tool-Ausführung (in Produktion: delegiere an spezialisierte Services)
       result = await simulateToolExecution(tool, parameters);
