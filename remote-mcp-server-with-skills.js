@@ -82,6 +82,17 @@ try {
   geverConnector = null;
 }
 
+// Portsicht-Aussenposten (securityBox misst ihre eigene Aussengrenze von hier aus)
+let portsichtConnector;
+try {
+  portsichtConnector = require('./portsicht-connector');
+  const ziele = portsichtConnector.freigegebeneZiele();
+  console.log(`✅ Portsicht Connector loaded (${ziele.length ? `Ziele: ${ziele.join(', ')}` : 'ohne Ziele – SEC_SCAN_ZIELE ist leer'})`);
+} catch (error) {
+  console.log('⚠️  Portsicht Connector not available:', error.message);
+  portsichtConnector = null;
+}
+
 // Skill-Definitionen laden
 let skillDefinitions = null;
 
@@ -371,7 +382,12 @@ app.get('/tools', (req, res) => {
     tools.push(...geverConnector.GEVER_TOOLS);
   }
 
-  console.log(`📋 /tools - Returning ${tools.length} tools (Router + Office + Kerio + Database + GEVER)`);
+  // Add Portsicht tools (Aussenansicht der securityBox)
+  if (portsichtConnector) {
+    tools.push(...portsichtConnector.PORTSICHT_TOOLS);
+  }
+
+  console.log(`📋 /tools - Returning ${tools.length} tools (Router + Office + Kerio + Database + GEVER + Portsicht)`);
   res.json(tools);
 });
 
@@ -584,6 +600,20 @@ app.post('/execute', async (req, res) => {
     } else if (amsConnector && amsConnector.isAmsTool(tool)) {
       // AMS Meeting-Agent (Sitzung/Protokoll) — nur Trigger/Status über den Bus
       result = await amsConnector.executeAmsTool(tool, parameters);
+    } else if (portsichtConnector && portsichtConnector.isPortsichtTool(tool)) {
+      // Aussenansicht: aktiver Verkehr auf freigegebene Ziele -> immer Token,
+      // kein Grace-Mode. Ohne SEC_SCAN_TOKEN bleibt das Tool aus (fail closed).
+      const scanToken = process.env.SEC_SCAN_TOKEN;
+      if (!scanToken) {
+        throw new Error(`${tool} ist deaktiviert (SEC_SCAN_TOKEN nicht gesetzt)`);
+      }
+      const providedToken = req.headers['x-mcp-bus-token']
+        || (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
+      if (providedToken !== scanToken) {
+        console.warn(`🚫 ${tool} ohne gueltiges Token abgelehnt`);
+        return res.status(401).json({ error: `${tool}: ungueltiges oder fehlendes Token (x-mcp-bus-token)` });
+      }
+      result = await portsichtConnector.executePortsichtTool(tool, parameters);
     } else if (geverConnector && geverConnector.isGeverTool(tool)) {
       // GEVER eCH-0160 Migrations-Schnittstelle
       result = await geverConnector.executeGeverTool(tool, parameters);

@@ -26,6 +26,21 @@
 | `PORT` | Number | ❌ Optional | `8080` | `8080` | Server Port (DigitalOcean setzt automatisch) |
 | `NODE_ENV` | String | ❌ Optional | `production` | `production` | Node.js Environment |
 
+### Portsicht-Aussenposten (securityBox)
+
+Die securityBox kann ihre **eigene** Aussengrenze nicht selbst messen — von innen
+antwortet der eigene Router (Hairpin-NAT). `sec_portsicht_scan` misst sie von hier
+aus. Ohne `SEC_SCAN_TOKEN` ist das Tool **deaktiviert** (fail closed), ohne
+`SEC_SCAN_ZIELE` lehnt es jeden Aufruf ab.
+
+| Variable Name | Typ | Erforderlich | Standard-Wert | Beispiel | Beschreibung |
+|--------------|-----|--------------|---------------|----------|--------------|
+| `SEC_SCAN_ZIELE` | String | ✅ Ja | - | `188.61.121.113` | Komma-Liste der **freigegebenen** Ziele. Der Aufrufer kann daraus auswählen, aber nichts hinzufügen — sonst stünde hier ein offener Portscanner, dessen Verkehr aus unserem DO-Konto käme. |
+| `SEC_SCAN_TOKEN` | String | ✅ Ja | - | `*******` | Eigenes Token, **nicht** `MCP_BUS_TOKEN` wiederverwenden. Fehlt es, bleibt das Tool aus. |
+| `SEC_SCAN_TIMEOUT_MS` | Number | ❌ Optional | `2000` | `2000` | Verbindungs-Timeout je Port |
+| `SEC_SCAN_BANNER_TIMEOUT_MS` | Number | ❌ Optional | `1500` | `1500` | Wartezeit auf ein Banner |
+| `SEC_SCAN_WORKERS` | Number | ❌ Optional | `12` | `12` | Gleichzeitige Verbindungen |
+
 ---
 
 ## Claude-Webapp - Erforderliche Environment Variables
