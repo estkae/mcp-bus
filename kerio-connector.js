@@ -6,6 +6,7 @@
 
 const Imap = require('imap');
 const { simpleParser } = require('mailparser');
+const { sicherheitsKopf } = require('./kerio-kopfzeilen');
 const nodemailer = require('nodemailer');
 
 // Kerio Configuration from Environment Variables
@@ -245,7 +246,8 @@ async function readEmail(params) {
                   filename: a.filename,
                   contentType: a.contentType,
                   size: a.size
-                })) || []
+                })) || [],
+                headers: sicherheitsKopf(parsed.headerLines)
               });
             });
           });
