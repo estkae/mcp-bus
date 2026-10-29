@@ -53,11 +53,16 @@ function getImapConnection() {
   });
 }
 
+// kopf: true fuer die securityBox: sie prueft den Posteingang nur an den
+// Kopfzeilen, der Body verlaesst den Mailserver dabei nie.
+const LISTE_FELDER = 'HEADER.FIELDS (FROM TO SUBJECT DATE)';
+const KOPF_FELDER = 'HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID REPLY-TO RETURN-PATH RECEIVED AUTHENTICATION-RESULTS RECEIVED-SPF)';
+
 /**
  * List emails from mailbox
  */
 async function listEmails(params) {
-  const { folder = 'INBOX', limit = 20, unreadOnly = false } = params;
+  const { folder = 'INBOX', limit = 20, unreadOnly = false, kopf = false } = params;
 
   // Debug: Log configuration (ohne Passwort)
   console.log(`📧 Kerio listEmails - Host: ${KERIO_CONFIG.host}, User: ${KERIO_CONFIG.username}, Port: ${KERIO_CONFIG.imapPort}`);
@@ -115,7 +120,7 @@ async function listEmails(params) {
           console.log(`📧 Fetching ${fetchResults.length} emails from ${folder}`);
 
           const fetch = imap.fetch(fetchResults, {
-            bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+            bodies: kopf ? KOPF_FELDER : LISTE_FELDER,
             struct: true
           });
 
@@ -138,6 +143,10 @@ async function listEmails(params) {
                   email.to = parsed.to?.text || '';
                   email.subject = parsed.subject || '';
                   email.date = parsed.date || '';
+                  if (kopf) {
+                    email.messageId = parsed.messageId || '';
+                    email.headers = sicherheitsKopf(parsed.headerLines);
+                  }
                 }
                 emails.push(email);
                 pendingParsers--;
@@ -795,6 +804,11 @@ const KERIO_TOOLS = [
         unreadOnly: {
           type: "boolean",
           description: "Only show unread emails (default: false)",
+          default: false
+        },
+        kopf: {
+          type: "boolean",
+          description: "Zusaetzlich Message-ID und sicherheitsrelevante Kopfzeilen (Reply-To, Return-Path, oberste Received, Authentication-Results, Received-SPF), nie den Body (default: false)",
           default: false
         }
       }
