@@ -56,7 +56,7 @@ function getImapConnection() {
 // kopf: true fuer die securityBox: sie prueft den Posteingang nur an den
 // Kopfzeilen, der Body verlaesst den Mailserver dabei nie.
 const LISTE_FELDER = 'HEADER.FIELDS (FROM TO SUBJECT DATE)';
-const KOPF_FELDER = 'HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID REPLY-TO RETURN-PATH RECEIVED AUTHENTICATION-RESULTS RECEIVED-SPF)';
+const KOPF_FELDER = 'HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID REPLY-TO RETURN-PATH RECEIVED AUTHENTICATION-RESULTS RECEIVED-SPF X-LOCARA-SIM)';
 
 /**
  * List emails from mailbox

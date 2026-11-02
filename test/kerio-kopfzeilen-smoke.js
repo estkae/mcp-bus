@@ -35,6 +35,9 @@ assert(kopf.find(k => k.name === 'dkim-signature').value === 'd=pdji.hdbhe.com; 
   'DKIM auf Domain, Selektor und Verfahren gekuerzt');
 assert(!JSON.stringify(kopf).includes('AAAAAAAA'), 'Signaturblock faellt weg');
 
+const sim = sicherheitsKopf([zeile('X-Locara-Sim', 'lsim1.k1.a.b.c.4000000000.mac')]);
+assert(sim[0]?.name === 'x-locara-sim' && sim[0].value.startsWith('lsim1.'), 'Simulations-Token kommt mit');
+
 assert(dkimKurz('d=x.ch') === 'd=x.ch', 'dkimKurz mit nur einer Angabe');
 assert(sicherheitsKopf([]).length === 0 && sicherheitsKopf(undefined).length === 0, 'leerer Kopf ergibt leere Liste');
 

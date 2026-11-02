@@ -11,7 +11,7 @@
  * Bewusst ohne Abhaengigkeit, damit sich die Auswahl ohne IMAP testen laesst.
  */
 
-const NAMEN = /^(authentication-results|arc-authentication-results|received-spf|dkim-signature|reply-to|return-path|sender|x-spam-[a-z-]+|x-kerio-[a-z-]+|x-mailer)$/i;
+const NAMEN = /^(authentication-results|arc-authentication-results|received-spf|dkim-signature|reply-to|return-path|sender|x-spam-[a-z-]+|x-kerio-[a-z-]+|x-mailer|x-locara-sim)$/i;
 
 // Ein Kopf kann aus einem Angreifer-Text bestehen; begrenzt wird er trotzdem.
 const MAX_LAENGE = 500;
